@@ -4,7 +4,15 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="DbEntityUrunModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="DbEntityUrunModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="TBLADMIN">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="tinyint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="KULLANICIADI" Type="varchar" MaxLength="20" />
+          <Property Name="SIFRE" Type="varchar" MaxLength="20" />
+        </EntityType>
         <EntityType Name="TBLKATAGORI">
           <Key>
             <PropertyRef Name="ID" />
@@ -20,6 +28,7 @@
           <Property Name="MUSTERIAD" Type="varchar" MaxLength="50" />
           <Property Name="MUSTERISOYAD" Type="varchar" MaxLength="30" />
           <Property Name="SEHIR" Type="varchar" MaxLength="15" />
+          <Property Name="DURUM" Type="bit" />
         </EntityType>
         <EntityType Name="TBLSATIS">
           <Key>
@@ -80,6 +89,7 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="DbEntityUrunModelStoreContainer">
+          <EntitySet Name="TBLADMIN" EntityType="Self.TBLADMIN" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="TBLKATAGORI" EntityType="Self.TBLKATAGORI" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="TBLMUSTERI" EntityType="Self.TBLMUSTERI" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="TBLSATIS" EntityType="Self.TBLSATIS" Schema="dbo" store:Type="Tables" />
@@ -97,8 +107,7 @@
             <End Role="TBLURUN" EntitySet="TBLURUN" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="DbEntityUrunModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -119,12 +128,15 @@
           <Property Name="MUSTERISOYAD" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
           <Property Name="SEHIR" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="TBLSATIS" Relationship="Self.FK_TBLSATIS_TBLMUSTERI" FromRole="TBLMUSTERI" ToRole="TBLSATIS" />
+          <Property Name="DURUM" Type="Boolean" />
         </EntityType>
         <EntityType Name="TBLSATIS">
           <Key>
             <PropertyRef Name="SATISID" />
           </Key>
           <Property Name="SATISID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="URUN" Type="Int32" />
+          <Property Name="MUSTERI" Type="Int32" />
           <Property Name="FIYAT" Type="Decimal" Precision="18" Scale="2" />
           <Property Name="TARIH" Type="DateTime" Precision="0" />
           <NavigationProperty Name="TBLMUSTERI" Relationship="Self.FK_TBLSATIS_TBLMUSTERI" FromRole="TBLSATIS" ToRole="TBLMUSTERI" />
@@ -140,22 +152,47 @@
           <Property Name="STOK" Type="Int16" />
           <Property Name="FIYAT" Type="Decimal" Precision="18" Scale="2" />
           <Property Name="DURUM" Type="Boolean" />
+          <Property Name="KATEGORI" Type="Int32" />
           <NavigationProperty Name="TBLKATAGORI" Relationship="Self.FK_TBLURUN_TBLKATAGORI" FromRole="TBLURUN" ToRole="TBLKATAGORI" />
           <NavigationProperty Name="TBLSATIS" Relationship="Self.FK_TBLSATIS_TBLURUN" FromRole="TBLURUN" ToRole="TBLSATIS" />
         </EntityType>
         <Association Name="FK_TBLURUN_TBLKATAGORI">
           <End Role="TBLKATAGORI" Type="Self.TBLKATAGORI" Multiplicity="0..1" />
           <End Role="TBLURUN" Type="Self.TBLURUN" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TBLKATAGORI">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="TBLURUN">
+              <PropertyRef Name="KATEGORI" />
+            </Dependent>
+          </ReferentialConstraint>
         </Association>
         <Association Name="FK_TBLSATIS_TBLMUSTERI">
           <End Role="TBLMUSTERI" Type="Self.TBLMUSTERI" Multiplicity="0..1" />
           <End Role="TBLSATIS" Type="Self.TBLSATIS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TBLMUSTERI">
+              <PropertyRef Name="MUSTERID" />
+            </Principal>
+            <Dependent Role="TBLSATIS">
+              <PropertyRef Name="MUSTERI" />
+            </Dependent>
+          </ReferentialConstraint>
         </Association>
         <Association Name="FK_TBLSATIS_TBLURUN">
           <End Role="TBLURUN" Type="Self.TBLURUN" Multiplicity="0..1" />
           <End Role="TBLSATIS" Type="Self.TBLSATIS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TBLURUN">
+              <PropertyRef Name="URUNID" />
+            </Principal>
+            <Dependent Role="TBLSATIS">
+              <PropertyRef Name="URUN" />
+            </Dependent>
+          </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="DbEntityUrunEntities" annotation:LazyLoadingEnabled="true">
+        <EntityContainer Name="DbEntityUrunEntities1" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="TBLKATAGORI" EntityType="Self.TBLKATAGORI" />
           <EntitySet Name="TBLMUSTERI" EntityType="Self.TBLMUSTERI" />
           <EntitySet Name="TBLSATIS" EntityType="Self.TBLSATIS" />
@@ -172,13 +209,22 @@
             <End Role="TBLURUN" EntitySet="TBLURUN" />
             <End Role="TBLSATIS" EntitySet="TBLSATIS" />
           </AssociationSet>
+          <EntitySet Name="TBLADMIN" EntityType="DbEntityUrunModel.TBLADMIN" />
         </EntityContainer>
+        <EntityType Name="TBLADMIN">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Byte" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SIFRE" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="KULLANICIADI" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="DbEntityUrunModelStoreContainer" CdmEntityContainer="DbEntityUrunEntities">
+        <EntityContainerMapping StorageEntityContainer="DbEntityUrunModelStoreContainer" CdmEntityContainer="DbEntityUrunEntities1">
           <EntitySetMapping Name="TBLKATAGORI">
             <EntityTypeMapping TypeName="DbEntityUrunModel.TBLKATAGORI">
               <MappingFragment StoreEntitySet="TBLKATAGORI">
@@ -190,6 +236,7 @@
           <EntitySetMapping Name="TBLMUSTERI">
             <EntityTypeMapping TypeName="DbEntityUrunModel.TBLMUSTERI">
               <MappingFragment StoreEntitySet="TBLMUSTERI">
+                <ScalarProperty Name="DURUM" ColumnName="DURUM" />
                 <ScalarProperty Name="MUSTERID" ColumnName="MUSTERID" />
                 <ScalarProperty Name="MUSTERIAD" ColumnName="MUSTERIAD" />
                 <ScalarProperty Name="MUSTERISOYAD" ColumnName="MUSTERISOYAD" />
@@ -201,6 +248,8 @@
             <EntityTypeMapping TypeName="DbEntityUrunModel.TBLSATIS">
               <MappingFragment StoreEntitySet="TBLSATIS">
                 <ScalarProperty Name="SATISID" ColumnName="SATISID" />
+                <ScalarProperty Name="URUN" ColumnName="URUN" />
+                <ScalarProperty Name="MUSTERI" ColumnName="MUSTERI" />
                 <ScalarProperty Name="FIYAT" ColumnName="FIYAT" />
                 <ScalarProperty Name="TARIH" ColumnName="TARIH" />
               </MappingFragment>
@@ -215,36 +264,19 @@
                 <ScalarProperty Name="STOK" ColumnName="STOK" />
                 <ScalarProperty Name="FIYAT" ColumnName="FIYAT" />
                 <ScalarProperty Name="DURUM" ColumnName="DURUM" />
+                <ScalarProperty Name="KATEGORI" ColumnName="KATEGORI" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <AssociationSetMapping Name="FK_TBLURUN_TBLKATAGORI" TypeName="DbEntityUrunModel.FK_TBLURUN_TBLKATAGORI" StoreEntitySet="TBLURUN">
-            <EndProperty Name="TBLKATAGORI">
-              <ScalarProperty Name="ID" ColumnName="KATEGORI" />
-            </EndProperty>
-            <EndProperty Name="TBLURUN">
-              <ScalarProperty Name="URUNID" ColumnName="URUNID" />
-            </EndProperty>
-            <Condition IsNull="false" ColumnName="KATEGORI" />
-          </AssociationSetMapping>
-          <AssociationSetMapping Name="FK_TBLSATIS_TBLMUSTERI" TypeName="DbEntityUrunModel.FK_TBLSATIS_TBLMUSTERI" StoreEntitySet="TBLSATIS">
-            <EndProperty Name="TBLMUSTERI">
-              <ScalarProperty Name="MUSTERID" ColumnName="MUSTERI" />
-            </EndProperty>
-            <EndProperty Name="TBLSATIS">
-              <ScalarProperty Name="SATISID" ColumnName="SATISID" />
-            </EndProperty>
-            <Condition IsNull="false" ColumnName="MUSTERI" />
-          </AssociationSetMapping>
-          <AssociationSetMapping Name="FK_TBLSATIS_TBLURUN" TypeName="DbEntityUrunModel.FK_TBLSATIS_TBLURUN" StoreEntitySet="TBLSATIS">
-            <EndProperty Name="TBLURUN">
-              <ScalarProperty Name="URUNID" ColumnName="URUN" />
-            </EndProperty>
-            <EndProperty Name="TBLSATIS">
-              <ScalarProperty Name="SATISID" ColumnName="SATISID" />
-            </EndProperty>
-            <Condition IsNull="false" ColumnName="URUN" />
-          </AssociationSetMapping>
+          <EntitySetMapping Name="TBLADMIN">
+            <EntityTypeMapping TypeName="DbEntityUrunModel.TBLADMIN">
+              <MappingFragment StoreEntitySet="TBLADMIN">
+                <ScalarProperty Name="KULLANICIADI" ColumnName="KULLANICIADI" />
+                <ScalarProperty Name="SIFRE" ColumnName="SIFRE" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
@@ -260,7 +292,7 @@
       <DesignerInfoPropertySet>
         <DesignerProperty Name="ValidateOnBuild" Value="true" />
         <DesignerProperty Name="EnablePluralization" Value="false" />
-        <DesignerProperty Name="IncludeForeignKeysInModel" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
         <DesignerProperty Name="UseLegacyProvider" Value="false" />
         <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
       </DesignerInfoPropertySet>

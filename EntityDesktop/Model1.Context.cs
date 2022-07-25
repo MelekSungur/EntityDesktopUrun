@@ -13,10 +13,10 @@ namespace EntityDesktop
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class DbEntityUrunEntities : DbContext
+    public partial class DbEntityUrunEntities1 : DbContext
     {
-        public DbEntityUrunEntities()
-            : base("name=DbEntityUrunEntities")
+        public DbEntityUrunEntities1()
+            : base("name=DbEntityUrunEntities1")
         {
         }
     
@@ -29,5 +29,6 @@ namespace EntityDesktop
         public virtual DbSet<TBLMUSTERI> TBLMUSTERI { get; set; }
         public virtual DbSet<TBLSATIS> TBLSATIS { get; set; }
         public virtual DbSet<TBLURUN> TBLURUN { get; set; }
+        public virtual DbSet<TBLADMIN> TBLADMIN { get; set; }
     }
 }

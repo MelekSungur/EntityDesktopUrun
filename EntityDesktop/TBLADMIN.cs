@@ -12,15 +12,10 @@ namespace EntityDesktop
     using System;
     using System.Collections.Generic;
     
-    public partial class TBLSATIS
+    public partial class TBLADMIN
     {
-        public int SATISID { get; set; }
-        public Nullable<int> URUN { get; set; }
-        public Nullable<int> MUSTERI { get; set; }
-        public Nullable<decimal> FIYAT { get; set; }
-        public Nullable<System.DateTime> TARIH { get; set; }
-    
-        public virtual TBLMUSTERI TBLMUSTERI { get; set; }
-        public virtual TBLURUN TBLURUN { get; set; }
+        public byte ID { get; set; }
+        public string SIFRE { get; set; }
+        public string KULLANICIADI { get; set; }
     }
 }

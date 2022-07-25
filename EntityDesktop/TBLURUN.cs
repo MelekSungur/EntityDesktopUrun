@@ -26,6 +26,7 @@ namespace EntityDesktop
         public Nullable<short> STOK { get; set; }
         public Nullable<decimal> FIYAT { get; set; }
         public Nullable<bool> DURUM { get; set; }
+        public Nullable<int> KATEGORI { get; set; }
     
         public virtual TBLKATAGORI TBLKATAGORI { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
